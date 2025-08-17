@@ -1,0 +1,112 @@
+managed implementation in class zbp_r_dt_inct_noa unique;
+strict ( 2 );
+with draft;
+
+define behavior for ZDD_INCIDENT_NOA alias Incident
+persistent table zdt_inct_noa
+draft table zdt_d_inct_noa
+etag master local_last_changed_at
+lock master total etag last_changed_at
+authorization master ( global, instance )
+
+{
+  create;
+  update;
+  delete;
+
+  association _History { create ( features : instance ); with draft; }
+
+  field ( readonly )
+  inc_uuid,
+  incident_id,
+  status,
+  changed_date,
+  local_created_by,
+  local_created_at,
+  local_last_changed_by,
+  local_last_changed_at,
+  last_changed_at;
+
+  field ( numbering : managed )
+  inc_uuid;
+
+  field ( mandatory )
+  title,
+  description,
+  priority;
+
+  action ( features : instance, authorization : update ) changeStatus
+    parameter zdd_change_status_param_noa result [1] $self;
+
+  side effects { action changeStatus affects $self; }
+
+  internal action setHistory;
+
+  determination setDefaultHistory on save { create; }
+
+  determination setDefaultValues on modify { create; }
+
+  draft action Activate optimized;
+  draft action Discard;
+  draft action Edit;
+  draft action Resume;
+  draft determine action Prepare;
+
+  mapping for zdt_inct_noa
+    {
+      inc_uuid              = inc_uuid;
+      incident_id           = incident_id;
+      title                 = title;
+      description           = description;
+      status                = status;
+      priority              = priority;
+      creation_date         = creation_date;
+      changed_date          = changed_date;
+      local_created_by      = local_created_by;
+      local_created_at      = local_created_at;
+      local_last_changed_by = local_last_changed_by;
+      local_last_changed_at = local_last_changed_at;
+      last_changed_at       = last_changed_at;
+    }
+}
+
+define behavior for ZDD_HIST_NOA alias History
+implementation in class zbp_dd_inct_h_noa unique
+persistent table zdt_inct_h_noa
+draft table zdt_d_inct_h_noa
+lock dependent by _Incident
+authorization dependent by _Incident
+etag master local_last_changed_at
+{
+  update;
+  delete;
+
+  association _Incident { with draft; }
+
+  field ( numbering : managed )
+  HisUUID;
+
+  field ( readonly )
+  HisUUID,
+  IncUUID,
+  local_created_by,
+  local_created_at,
+  local_last_changed_by,
+  local_last_changed_at,
+  last_changed_at;
+
+  mapping for zdt_inct_h_noa
+    {
+      HisUUID               = his_uuid;
+      IncUUID               = inc_uuid;
+      HisID                 = his_id;
+      previousStatus        = previous_status;
+      newStatus             = new_status;
+      text                  = text;
+      local_created_by      = local_created_by;
+      local_created_at      = local_created_at;
+      local_last_changed_by = local_last_changed_by;
+      local_last_changed_at = local_last_changed_at;
+      last_changed_at       = last_changed_at;
+    }
+}
