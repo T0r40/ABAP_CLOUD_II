@@ -1,6 +1,5 @@
 # Incident Management
 ## Table of Contents
-## Table of Contents
 1. [Scope](#1-scope)  
 2. [Functional Overview](#2-functional-overview)  
 3. [Technical Requirements](#3-technical-requirements)  
